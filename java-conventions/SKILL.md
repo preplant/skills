@@ -77,6 +77,39 @@ final UUID uuid = player.getUniqueId();
 
 A non-final local communicates intentional reassignment.
 
+## Local Type Inference
+
+Use explicit local variable types by default.
+
+Use `var` only when the explicit type would be disproportionately long and the
+initializer still makes the type and purpose clear, such as a deeply
+parameterized `Map.Entry`.
+
+Prefer:
+
+```java
+final Player player = event.getPlayer();
+final var entry = iterator.next(); // Map.Entry<UUID, Map<String, ProfileData>>
+```
+
+Do not use `var` merely to shorten an ordinary, readable type.
+
+## Multiline Operators
+
+When an expression spans multiple lines, place operators such as `+`, `-`,
+`&&`, and `||` at the beginning of the continued line, never at the end of the
+preceding line.
+
+```java
+final boolean allowed = player.isOnline()
+    && player.hasPermission(PERMISSION)
+    || player.isOp();
+
+final int total = base
+    + bonus
+    - penalty;
+```
+
 ## Getter Extraction
 
 When the same getter is used more than once within a method, normally extract
@@ -469,6 +502,28 @@ Do not repeat class context unnecessarily in method names.
 
 # Design And Structure
 
+## Type Imports
+
+Import Java types and refer to them by their simple names.
+
+Never use a fully qualified type name inline when an import can represent it.
+Use a fully qualified type name only when another class with the same simple
+name is already used in that scope and prevents an unambiguous import.
+
+Prefer:
+
+```java
+import net.oceanias.opal.profile.Profile;
+
+final Profile profile = profiles.get(player);
+```
+
+over:
+
+```java
+final net.oceanias.opal.profile.Profile profile = profiles.get(player);
+```
+
 ## Plugin Modules
 
 Application/plugin projects normally organize domain modules using established
@@ -745,6 +800,9 @@ Verify:
 * repeated getters were extracted where appropriate;
 * singleton getters were not unnecessarily extracted;
 * locals use `final` wherever possible;
+* `var` is used only for disproportionately long explicit types with clear
+  initializers;
+* operators in multiline expressions begin continued lines;
 * variables are grouped by purpose;
 * variable/executable sections use required spacing;
 * guards use early `return` or `continue`;
@@ -761,6 +819,8 @@ Verify:
   where actually applicable;
 * equivalent methods preserve established verbs;
 * new classes match sibling word-count and vocabulary families;
+* types use imports and simple names unless a same-name type in the scope makes
+  qualification necessary;
 * plugin packages follow established semantic roles;
 * API/library structure was not forced into plugin-module conventions;
 * Lombok replaces appropriate mechanical boilerplate;
