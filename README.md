@@ -6,6 +6,20 @@ This repository contains agent instructions for making coding workflows more con
 
 ## Skills
 
+### `ssh-mcp`
+
+Operational guidance for using SSH-MCP safely and efficiently across remote
+hosts.
+
+The skill prefers commands SSH-MCP accepts as `read-only`, uses broader tools
+only when the authorized operation genuinely requires them, and treats
+classification, policy, approval, profile, transport, timeout, and remote-exit
+failures distinctly. It also covers bounded output, parallel independent reads,
+safe session use, and avoiding policy-circumvention behavior.
+
+**Requires:** SSH-MCP connected to the agent with at least one configured SSH
+profile.
+
 ### `mcp-steroid`
 
 Guidance for using MCP Steroid efficiently and safely with IntelliJ IDEA.
