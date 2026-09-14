@@ -17,10 +17,57 @@ Use the least permissive SSH-MCP tool that can complete the authorized task.
 Treat the remote host as production unless the user explicitly establishes a
 different safety boundary.
 
+## Configuration And Profiles
+
+SSH-MCP stores multi-host configuration and named profiles in a TOML
+configuration file. The default platform locations are:
+
+* Linux: `~/.config/ssh-mcp/config.toml` or
+  `$XDG_CONFIG_HOME/ssh-mcp/config.toml`;
+* macOS: `~/Library/Application Support/ssh-mcp/config.toml`;
+* Windows: `%APPDATA%\ssh-mcp\config.toml`.
+
+Profiles are declared as `[[profiles]]` entries in this file. Do not search
+OpenSSH configuration, project repositories, or unrelated MCP configuration
+when an SSH-MCP profile needs to be inspected or changed.
+
+An SSH-MCP process may instead be started with `--config <path>`. When an
+explicit config path is configured for the MCP server, treat that path as
+authoritative rather than the platform default.
+
+When a required profile is missing and modification of the local SSH-MCP
+configuration is authorized:
+
+1. Locate the active configuration using the explicit `--config` path when
+   present; otherwise use the platform default above.
+2. Read the existing configuration before modifying it.
+3. Preserve existing defaults, profiles, policy, and formatting where
+   practical.
+4. Add only the required `[[profiles]]` entry, following existing profile
+   conventions and using the least privilege appropriate for the target.
+5. Never generate, replace, expose, or modify an existing SSH private key merely
+   to create a profile. Reference the authorized key through `keyRef`.
+6. Restart or reload the SSH-MCP server/client if required for configuration
+   changes to become visible.
+7. Verify the profile through `list-connections` before using it.
+
+Do not silently fall back to direct SSH merely because an SSH-MCP profile is
+missing. If the configuration cannot be modified because of filesystem,
+client, tool, or authorization constraints, report the exact limitation.
+
+On Windows, automatic discovery of `%APPDATA%\ssh-mcp\config.toml` has had
+reported compatibility issues in some SSH-MCP versions. If the expected file
+exists but SSH-MCP reports that no configuration was found, inspect how the MCP
+server process is launched and prefer configuring an explicit
+`--config <path>` rather than duplicating profiles or moving configuration
+blindly.
+
 ## Preflight
 
 1. Call `list-connections` before the first remote operation when the available
-   profiles are not already known in the current conversation.
+   profiles are not already known in the current conversation. If a required
+   profile is absent, follow `Configuration And Profiles` rather than searching
+   arbitrary filesystem locations or immediately falling back to direct SSH.
 2. Select the returned profile by exact name. Pass `profile` explicitly when
    more than one profile exists or the intended target is not unquestionably
    the configured default.
